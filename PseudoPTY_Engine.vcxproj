@@ -11,6 +11,7 @@
     <ProjectGuid>{00000000-0000-0000-0000-000000000001}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PseudoPTY_Engine</RootNamespace>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
