@@ -14,21 +14,29 @@ jobs:
     - name: Setup MSVC
       uses: microsoft/setup-msbuild@v1
 
+    - name: Set up Visual Studio environment
+      shell: cmd
+      run: '"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"'
+
     - name: Build Engine DLL
+      shell: cmd
       run: cl /LD src\Engine.c /Fe:Engine.dll
 
     - name: Build WindowsPty DLL
+      shell: cmd
       run: cl /LD src\WindowsPty.c /I src /link Engine.lib /Fe:WindowsPty.dll
 
     - name: Build Pty EXE
+      shell: cmd
       run: cl src\Pty.c /I src /link WindowsPty.lib Engine.lib /Fe:Pty.exe
 
     - name: Create ZIP
-      run: powershell -Command "Compress-Archive -Path Engine.dll,WindowsPty.dll,Pty.exe -DestinationPath PseudoPTY.zip"
+      shell: powershell
+      run: Compress-Archive -Path Engine.dll,WindowsPty.dll,Pty.exe -DestinationPath PseudoPTY.zip
 
     - name: Create GitHub Release
-      id: create_release
       uses: actions/create-release@v1
+      id: create_release
       with:
         tag_name: v1.0.0
         release_name: PseudoPTY v1.0.0
