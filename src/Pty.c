@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
     }
 
        flush_pty_output(Pty_Read, pty);
+           interactive_input(Pty_Write, pty);
 
     char buffer[512];
     while (1) {
