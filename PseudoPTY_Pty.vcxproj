@@ -5,6 +5,7 @@
     <ClInclude Include="src\WindowsPty.h" />
     <ClInclude Include="src\Engine.h" />
   </ItemGroup>
+
   <PropertyGroup>
     <ConfigurationType>Application</ConfigurationType>
     <OutDir>$(MSBuildThisFileDirectory)bin\</OutDir>
@@ -14,9 +15,14 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <Configuration>Release</Configuration>
   </PropertyGroup>
+
   <ItemDefinitionGroup>
     <Link>
       <AdditionalDependencies>WindowsPty.lib;Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
