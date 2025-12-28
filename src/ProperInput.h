@@ -15,11 +15,14 @@ static void flush_pty_output(int (*Pty_ReadFunc)(void*, char*, int), void* pty) 
     }
 }
 
-static void interactive_input(int (*Pty_WriteFunc)(void*, const char*, int), void* pty) {
+static void interactive_input(int (*Pty_WriteFunc)(void*, const char*, int),
+                              int (*Pty_ReadFunc)(void*, char*, int),
+                              void* pty) {
+    char buffer[512];
     while (1) {
+        flush_pty_output(Pty_ReadFunc, pty);
         if (_kbhit()) {
             int c = _getch();
-
             if (c == 3) { // Ctrl+C
                 const char ctrl_c = 3;
                 Pty_WriteFunc(pty, &ctrl_c, 1);
@@ -35,15 +38,13 @@ static void interactive_input(int (*Pty_WriteFunc)(void*, const char*, int), voi
                 Pty_WriteFunc(pty, &bs, 1);
                 fputs("\b \b", stdout);
                 fflush(stdout);
-            } else { // Normal characters
+            } else {
                 char ch = (char)c;
                 Pty_WriteFunc(pty, &ch, 1);
                 fputc(ch, stdout);
                 fflush(stdout);
             }
         }
-
-        flush_pty_output(Pty_ReadFunc, pty);
     }
 }
 
