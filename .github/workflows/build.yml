@@ -16,13 +16,13 @@ jobs:
       uses: microsoft/setup-msbuild@v1
 
     - name: Build Engine DLL
-      run: msbuild PseudoPTY_Engine.vcxproj /p:Configuration=Release
+      run: msbuild PseudoPTY_Engine.vcxproj /p:Configuration=Release  /p:Platform=x64
 
     - name: Build WindowsPty DLL
-      run: msbuild PseudoPTY_WindowsPty.vcxproj /p:Configuration=Release
+      run: msbuild PseudoPTY_WindowsPty.vcxproj /p:Configuration=Release  /p:Platform=x64
 
     - name: Build Pty EXE
-      run: msbuild PseudoPTY_Pty.vcxproj /p:Configuration=Release
+      run: msbuild PseudoPTY_Pty.vcxproj /p:Configuration=Release  /p:Platform=x64
 
     - name: Collect artifacts
       run: |
