@@ -1,0 +1,15 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Engine.c" />
+    <ClInclude Include="src\Engine.h" />
+  </ItemGroup>
+  <PropertyGroup>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <OutDir>$(MSBuildThisFileDirectory)bin\</OutDir>
+    <TargetName>Engine</TargetName>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <Configuration>Release</Configuration>
+  </PropertyGroup>
+</Project>
