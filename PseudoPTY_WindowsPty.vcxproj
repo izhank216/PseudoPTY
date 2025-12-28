@@ -20,6 +20,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <OutDir>$(MSBuildThisFileDirectory)bin\x64\Release\</OutDir>
+    <TargetName>WindowsPty</TargetName>
   </PropertyGroup>
 
   <ItemGroup>
