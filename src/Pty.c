@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
     }
 
        flush_pty_output(Pty_Read, pty);
-    wake_shell(Pty_Write, pty);
 
     char buffer[512];
     while (1) {
