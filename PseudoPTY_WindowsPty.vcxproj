@@ -26,11 +26,13 @@
     <ClCompile Include="src\WindowsPty.c" />
     <ClInclude Include="src\WindowsPty.h" />
     <ClInclude Include="src\Engine.h" />
+      <ProjectReference Include="PseudoPTY_Engine.vcxproj">
+    <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+  </ProjectReference>
   </ItemGroup>
 
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-       <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)bin\x64\Release\</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
