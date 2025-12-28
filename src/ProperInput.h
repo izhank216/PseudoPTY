@@ -5,23 +5,18 @@
 #include <stdio.h>
 
 static void flush_pty_output(int (*Pty_ReadFunc)(void*, char*, int), void* pty) {
-    char buffer[256];
-    int n = Pty_ReadFunc(pty, buffer, sizeof(buffer) - 1);
-    if (n > 0) {
+    char buffer[512];
+    int n;
+    while ((n = Pty_ReadFunc(pty, buffer, sizeof(buffer) - 1)) > 0) {
         buffer[n] = '\0';
-        printf("%s", buffer);
+        fputs(buffer, stdout);
         fflush(stdout);
     }
-}
-
-static void wake_shell(int (*Pty_WriteFunc)(void*, const char*, int), void* pty) {
-    Pty_WriteFunc(pty, "\n", 1);
 }
 
 #else
 
 static void flush_pty_output(void* pty) {}
-static void wake_shell(void* pty) {}
 
 #endif
 
