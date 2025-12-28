@@ -27,9 +27,9 @@ jobs:
     - name: Collect artifacts
       run: |
         mkdir release
-        copy bin\Engine.dll release\
-        copy bin\WindowsPty.dll release\
-        copy bin\Pty.exe release\
+        copy bin\x64\Release\Engine.dll release\
+        copy bin\x64\Release\WindowsPty.dll release\
+        copy bin\x64\Release\Pty.exe release\
 
     - name: Create ZIP
       run: powershell -Command "Compress-Archive -Path release\* -DestinationPath PseudoPTY.zip"
