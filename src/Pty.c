@@ -1,4 +1,5 @@
 #include "Pty.h"
+#include "VirtualTerminalProcessing.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -31,6 +32,8 @@ int Pty_Read(Pty* pty, char* buffer, int len) {
 }
 
 int main(int argc, char** argv) {
+       enable_virtual_terminal(); 
+    
     if (argc < 3 || strcmp(argv[1], "--terminal") != 0) {
         printf("Usage: %s --terminal <cmd.exe|powershell.exe>\n", argv[0]);
         return 1;
