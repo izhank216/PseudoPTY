@@ -1,4 +1,5 @@
 #include "Pty.h"
+#include "ProperInput.h"
 #include "VirtualTerminalProcessing.h"
 #include <stdio.h>
 #include <string.h>
@@ -34,6 +35,7 @@ int Pty_Read(Pty* pty, char* buffer, int len) {
 int main(int argc, char** argv) {
        enable_virtual_terminal(); 
     
+    
     if (argc < 3 || strcmp(argv[1], "--terminal") != 0) {
         printf("Usage: %s --terminal <cmd.exe|powershell.exe>\n", argv[0]);
         return 1;
@@ -45,6 +47,9 @@ int main(int argc, char** argv) {
         printf("Failed to create PTY\n");
         return 1;
     }
+
+       flush_pty_output(Pty_Read, pty);
+    wake_shell(Pty_Write, pty);
 
     char buffer[512];
     while (1) {
