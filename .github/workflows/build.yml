@@ -1,0 +1,46 @@
+name: Build and Release PseudoPTY
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup MSVC
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Build Engine DLL
+      run: cl /LD src\Engine.c /Fe:Engine.dll
+
+    - name: Build WindowsPty DLL
+      run: cl /LD src\WindowsPty.c /I src /link Engine.lib /Fe:WindowsPty.dll
+
+    - name: Build Pty EXE
+      run: cl src\Pty.c /I src /link WindowsPty.lib Engine.lib /Fe:Pty.exe
+
+    - name: Create ZIP
+      run: powershell -Command "Compress-Archive -Path Engine.dll,WindowsPty.dll,Pty.exe -DestinationPath PseudoPTY.zip"
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        tag_name: v1.0.0
+        release_name: PseudoPTY v1.0.0
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload ZIP to Release
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./PseudoPTY.zip
+        asset_name: PseudoPTY.zip
+        asset_content_type: application/zip
