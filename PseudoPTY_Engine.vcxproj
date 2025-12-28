@@ -1,20 +1,32 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{00000000-0000-0000-0000-000000000001}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PseudoPTY_Engine</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <OutDir>$(MSBuildThisFileDirectory)bin\x64\Release\</OutDir>
+  </PropertyGroup>
+
   <ItemGroup>
     <ClCompile Include="src\Engine.c" />
     <ClInclude Include="src\Engine.h" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <OutDir>$(MSBuildThisFileDirectory)bin\</OutDir>
-    <TargetName>Engine</TargetName>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <Configuration>Release</Configuration>
-  </PropertyGroup>
-
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
 </Project>
