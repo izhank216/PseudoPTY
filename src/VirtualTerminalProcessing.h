@@ -5,8 +5,12 @@
 #include <windows.h>
 
 static void enable_virtual_terminal() {
+    static int enabled = 0;
+    if (enabled) return;
+    enabled = 1;
+
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut == INVALID_HANDLE_VALUE) return;
+    if (hOut == INVALID_HANDLE_VALUE || hOut == NULL) return;
 
     DWORD dwMode = 0;
     if (!GetConsoleMode(hOut, &dwMode)) return;
