@@ -1,0 +1,48 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{00000000-0000-0000-0000-000000000003}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>PseudoPTY_NodeWrapper</RootNamespace>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <OutDir>$(MSBuildThisFileDirectory)bin\x64\ReleaseNode\</OutDir>
+    <TargetName>PseudoPTY</TargetName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClCompile Include="src\PseudoPTY_NodeWrapper.c" />
+    <ClInclude Include="src\WindowsPty.h" />
+    <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\ProperInput.h" />
+    <ClInclude Include="src\VirtualTerminalProcessing.h" />
+  </ItemGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Program Files\nodejs\include\node;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)bin\x64\Release\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;WindowsPty.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+
+</Project>
