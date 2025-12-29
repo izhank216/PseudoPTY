@@ -27,13 +27,18 @@ jobs:
     - name: Build Pty EXE
       run: msbuild PseudoPTY_Pty.vcxproj /p:Configuration=Release  /p:Platform=x64
 
+    - name: Build PseudoPTY Node Addon
+      run: msbuild PseudoPTY_NodeWrapper.vcxproj /p:Configuration=Release /p:Platform=x64
+
+
     - name: Collect artifacts
       run: |
         mkdir release
         copy bin\x64\Release\Engine.dll release\
         copy bin\x64\Release\WindowsPty.dll release\
         copy bin\x64\Release\Pty.exe release\
-
+        copy bin\x64\ReleaseNode\PseudoPTY.node release\
+        
     - name: Create ZIP
       run: powershell -Command "Compress-Archive -Path release\* -DestinationPath PseudoPTY.zip"
 
