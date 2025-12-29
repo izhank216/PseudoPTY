@@ -5,7 +5,12 @@
 
 WindowsPty* PseudoPTY_Create(const char* command, int cols, int rows) {
     enable_virtual_terminal();
-    return WindowsPty_Create(command, cols, rows);
+    WindowsPty* pty = WindowsPty_Create(command, cols, rows);
+    if (pty) {
+        flush_pty_output(PseudoPTY_Read, pty);
+        interactive_input(PseudoPTY_Write, PseudoPTY_Read, pty);
+    }
+    return pty;
 }
 
 void PseudoPTY_Destroy(WindowsPty* pty) {
