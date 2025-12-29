@@ -37,6 +37,7 @@ jobs:
         copy bin\x64\Release\Engine.dll release\
         copy bin\x64\Release\WindowsPty.dll release\
         copy bin\x64\Release\Pty.exe release\
+        rename bin\x64\ReleaseNode\PseudoPTY.dll PseudoPTY.node
         copy bin\x64\ReleaseNode\PseudoPTY.node release\
         
     - name: Create ZIP
