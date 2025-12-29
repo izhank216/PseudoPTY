@@ -6,13 +6,13 @@ PseudoPTY is a native Windows pseudo-terminal project written in C.
 
 ## Installation
 
-Install via npm:
+*Install via npm:*
 
 ```bash
 npm install @izhank216/pseudopty
 ```
 
-**Or with yarn:**
+*Or with yarn:*
 ```bash
 yarn add @izhank216/pseudopty
 ```
