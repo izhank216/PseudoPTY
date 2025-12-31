@@ -15,40 +15,58 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    # MSBuild (for non-node binaries)
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
+    # Node.js (includes node-gyp)
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        architecture: x64
+
+    # Install node-gyp explicitly (safe)
+    - name: Install node-gyp
+      run: npm install -g node-gyp
+
+    # Build native engine DLLs
     - name: Build Engine DLL
-      run: msbuild PseudoPTY_Engine.vcxproj /p:Configuration=Release  /p:Platform=x64
+      run: msbuild PseudoPTY_Engine.vcxproj /p:Configuration=Release /p:Platform=x64
 
     - name: Build WindowsPty DLL
-      run: msbuild PseudoPTY_WindowsPty.vcxproj /p:Configuration=Release  /p:Platform=x64
+      run: msbuild PseudoPTY_WindowsPty.vcxproj /p:Configuration=Release /p:Platform=x64
 
     - name: Build Pty EXE
-      run: msbuild PseudoPTY_Pty.vcxproj /p:Configuration=Release  /p:Platform=x64
+      run: msbuild PseudoPTY_Pty.vcxproj /p:Configuration=Release /p:Platform=x64
 
-    - name: Build PseudoPTY Node Addon
-      run: msbuild PseudoPTY_NodeWrapper.vcxproj /p:Configuration=Release /p:Platform=x64
+    # Build Node addon using node-gyp (IMPORTANT)
+    - name: Build Node Addon (.node)
+      run: |
+        cd PseudoPTY_NodeWrapper
+        node-gyp rebuild --release
 
-
+    # Collect artifacts
     - name: Collect artifacts
+      shell: powershell
       run: |
         mkdir release
-        copy bin\x64\Release\Engine.dll release\
-        copy bin\x64\Release\WindowsPty.dll release\
-        copy bin\x64\Release\Pty.exe release\
-        Rename-Item -Path "bin\x64\ReleaseNode\PseudoPTY.dll" -NewName "PseudoPTY.node"
-        copy bin\x64\ReleaseNode\PseudoPTY.node release\
-        
+        Copy-Item bin\x64\Release\Engine.dll release\
+        Copy-Item bin\x64\Release\WindowsPty.dll release\
+        Copy-Item bin\x64\Release\Pty.exe release\
+        Copy-Item PseudoPTY_NodeWrapper\build\Release\PseudoPTY.node release\
+
+    # Zip
     - name: Create ZIP
       run: powershell -Command "Compress-Archive -Path release\* -DestinationPath PseudoPTY.zip"
 
+    # Release
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
       with:
-        tag_name: v1.0.6
-        release_name: PseudoPTY v1.0.6
+        tag_name: v1.0.7
+        release_name: PseudoPTY v1.0.7
         draft: false
         prerelease: false
       env:
