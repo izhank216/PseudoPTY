@@ -1,95 +1,61 @@
-#include <node.h>
-#include <v8.h>
-
+#include <napi.h>
 extern "C" {
-    #include "PseudoPTY_NodeWrapper.c"
+#include "PseudoPTY_NodeWrapper.c"
 }
 
-using namespace v8;
+using namespace Napi;
 
-class PtyWrapper {
-public:
-    WindowsPty* pty;
+Value PseudoPTY_CreateWrapped(const CallbackInfo& info) {
+    Env env = info.Env();
+    std::string command = info[0].As<String>().Utf8Value();
+    int cols = info[1].As<Number>().Int32Value();
+    int rows = info[2].As<Number>().Int32Value();
+    WindowsPty* pty = PseudoPTY_Create(command.c_str(), cols, rows);
+    return External<WindowsPty>::New(env, pty);
+}
 
-    PtyWrapper() : pty(nullptr) {}
+Value PseudoPTY_ReadWrapped(const CallbackInfo& info) {
+    Env env = info.Env();
+    WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    int len = info[1].As<Number>().Int32Value();
+    char* buffer = new char[len];
+    int n = PseudoPTY_Read(pty, buffer, len);
+    std::string result(buffer, n);
+    delete[] buffer;
+    return String::New(env, result);
+}
 
-    static void New(const FunctionCallbackInfo<Value>& args) {
-        Isolate* isolate = args.GetIsolate();
-        if (!args.IsConstructCall()) {
-            isolate->ThrowException(String::NewFromUtf8Literal(isolate, "Must use new"));
-            return;
-        }
+Value PseudoPTY_WriteWrapped(const CallbackInfo& info) {
+    Env env = info.Env();
+    WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    std::string data = info[1].As<String>().Utf8Value();
+    int written = PseudoPTY_Write(pty, data.c_str(), data.size());
+    return Number::New(env, written);
+}
 
-        PtyWrapper* obj = new PtyWrapper();
-        if (args.Length() >= 3) {
-            v8::String::Utf8Value cmd(isolate, args[0]);
-            int cols = args[1]->Int32Value(isolate->GetCurrentContext()).FromMaybe(80);
-            int rows = args[2]->Int32Value(isolate->GetCurrentContext()).FromMaybe(25);
-            obj->pty = PseudoPTY_Create(*cmd, cols, rows);
-        }
+void PseudoPTY_DestroyWrapped(const CallbackInfo& info) {
+    WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    PseudoPTY_Destroy(pty);
+}
 
-        args.This()->SetAlignedPointerInInternalField(0, obj);
-        args.GetReturnValue().Set(args.This());
-    }
+void PseudoPTY_FlushWrapped(const CallbackInfo& info) {
+    WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    PseudoPTY_Flush(pty);
+}
 
-    static void Write(const FunctionCallbackInfo<Value>& args) {
-        Isolate* isolate = args.GetIsolate();
-        PtyWrapper* obj = static_cast<PtyWrapper*>(args.This()->GetAlignedPointerFromInternalField(0));
-        if (!obj->pty) return;
+void PseudoPTY_InteractiveWrapped(const CallbackInfo& info) {
+    WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    PseudoPTY_Interactive(pty);
+}
 
-        v8::String::Utf8Value data(isolate, args[0]);
-        int len = args[1]->Int32Value(isolate->GetCurrentContext()).FromMaybe((int)strlen(*data));
-        int written = PseudoPTY_Write(obj->pty, *data, len);
+Object Init(Env env, Object exports) {
+    exports.Set("PseudoPTY_Create", Function::New(env, PseudoPTY_CreateWrapped));
+    exports.Set("PseudoPTY_Read", Function::New(env, PseudoPTY_ReadWrapped));
+    exports.Set("PseudoPTY_Write", Function::New(env, PseudoPTY_WriteWrapped));
+    exports.Set("PseudoPTY_Destroy", Function::New(env, PseudoPTY_DestroyWrapped));
+    exports.Set("PseudoPTY_Flush", Function::New(env, PseudoPTY_FlushWrapped));
+    exports.Set("PseudoPTY_Interactive", Function::New(env, PseudoPTY_InteractiveWrapped));
+    return exports;
+}
 
-        args.GetReturnValue().Set(written);
-    }
-
-    static void Read(const FunctionCallbackInfo<Value>& args) {
-        Isolate* isolate = args.GetIsolate();
-        PtyWrapper* obj = static_cast<PtyWrapper*>(args.This()->GetAlignedPointerFromInternalField(0));
-        if (!obj->pty) return;
-
-        int len = args[0]->Int32Value(isolate->GetCurrentContext()).FromMaybe(512);
-        char* buffer = new char[len];
-        int n = PseudoPTY_Read(obj->pty, buffer, len);
-        v8::Local<v8::String> result = String::NewFromUtf8(isolate, buffer, v8::NewStringType::kNormal, n).ToLocalChecked();
-        delete[] buffer;
-        args.GetReturnValue().Set(result);
-    }
-
-    static void Flush(const FunctionCallbackInfo<Value>& args) {
-        PtyWrapper* obj = static_cast<PtyWrapper*>(args.This()->GetAlignedPointerFromInternalField(0));
-        if (!obj->pty) return;
-        PseudoPTY_Flush(obj->pty);
-    }
-
-    static void Interactive(const FunctionCallbackInfo<Value>& args) {
-        PtyWrapper* obj = static_cast<PtyWrapper*>(args.This()->GetAlignedPointerFromInternalField(0));
-        if (!obj->pty) return;
-        PseudoPTY_Interactive(obj->pty);
-    }
-
-    static void Destroy(const FunctionCallbackInfo<Value>& args) {
-        PtyWrapper* obj = static_cast<PtyWrapper*>(args.This()->GetAlignedPointerFromInternalField(0));
-        if (!obj->pty) return;
-        PseudoPTY_Destroy(obj->pty);
-        obj->pty = nullptr;
-    }
-
-    static void Init(Local<Object> exports) {
-        Isolate* isolate = exports->GetIsolate();
-        Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
-        tpl->SetClassName(String::NewFromUtf8Literal(isolate, "PseudoPTY"));
-        tpl->InstanceTemplate()->SetInternalFieldCount(1);
-
-        NODE_SET_PROTOTYPE_METHOD(tpl, "write", Write);
-        NODE_SET_PROTOTYPE_METHOD(tpl, "read", Read);
-        NODE_SET_PROTOTYPE_METHOD(tpl, "flush", Flush);
-        NODE_SET_PROTOTYPE_METHOD(tpl, "interactive", Interactive);
-        NODE_SET_PROTOTYPE_METHOD(tpl, "destroy", Destroy);
-
-        exports->Set(isolate->GetCurrentContext(), String::NewFromUtf8Literal(isolate, "PseudoPTY"), tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked()).Check();
-    }
-};
-
-NODE_MODULE(PseudoPTY, PtyWrapper::Init)
+NODE_API_MODULE(PseudoPTY, Init)
