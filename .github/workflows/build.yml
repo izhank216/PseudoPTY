@@ -30,6 +30,10 @@ jobs:
     - name: Install node-gyp
       run: npm install -g node-gyp
 
+    - name: Install NAPI
+      run: npm install node-addon-api
+      
+
     # Build native engine DLLs
     - name: Build Engine DLL
       run: msbuild PseudoPTY_Engine.vcxproj /p:Configuration=Release /p:Platform=x64
