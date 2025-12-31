@@ -43,7 +43,6 @@ jobs:
     # Build Node addon using node-gyp (IMPORTANT)
     - name: Build Node Addon (.node)
       run: |
-        cd PseudoPTY_NodeWrapper
         node-gyp rebuild --release
 
     # Collect artifacts
