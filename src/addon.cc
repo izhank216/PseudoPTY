@@ -11,12 +11,20 @@ Value PseudoPTY_CreateWrapped(const CallbackInfo& info) {
     int cols = info[1].As<Number>().Int32Value();
     int rows = info[2].As<Number>().Int32Value();
     WindowsPty* pty = PseudoPTY_Create(command.c_str(), cols, rows);
+    if (!pty) {
+        Error::New(env, "Terminal does not exist").ThrowAsJavaScriptException();
+        return env.Null();
+    }
     return External<WindowsPty>::New(env, pty);
 }
 
 Value PseudoPTY_ReadWrapped(const CallbackInfo& info) {
     Env env = info.Env();
     WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    if (!pty) {
+        Error::New(env, "PseudoPTY not created").ThrowAsJavaScriptException();
+        return env.Null();
+    }
     int len = info[1].As<Number>().Int32Value();
     char* buffer = new char[len];
     int n = PseudoPTY_Read(pty, buffer, len);
@@ -28,6 +36,10 @@ Value PseudoPTY_ReadWrapped(const CallbackInfo& info) {
 Value PseudoPTY_WriteWrapped(const CallbackInfo& info) {
     Env env = info.Env();
     WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    if (!pty) {
+        Error::New(env, "PseudoPTY not created").ThrowAsJavaScriptException();
+        return env.Null();
+    }
     std::string data = info[1].As<String>().Utf8Value();
     int written = PseudoPTY_Write(pty, data.c_str(), data.size());
     return Number::New(env, written);
@@ -35,16 +47,28 @@ Value PseudoPTY_WriteWrapped(const CallbackInfo& info) {
 
 void PseudoPTY_DestroyWrapped(const CallbackInfo& info) {
     WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    if (!pty) {
+        Error::New(info.Env(), "PseudoPTY not created").ThrowAsJavaScriptException();
+        return;
+    }
     PseudoPTY_Destroy(pty);
 }
 
 void PseudoPTY_FlushWrapped(const CallbackInfo& info) {
     WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    if (!pty) {
+        Error::New(info.Env(), "PseudoPTY not created").ThrowAsJavaScriptException();
+        return;
+    }
     PseudoPTY_Flush(pty);
 }
 
 void PseudoPTY_InteractiveWrapped(const CallbackInfo& info) {
     WindowsPty* pty = info[0].As<External<WindowsPty>>().Data();
+    if (!pty) {
+        Error::New(info.Env(), "PseudoPTY not created").ThrowAsJavaScriptException();
+        return;
+    }
     PseudoPTY_Interactive(pty);
 }
 
